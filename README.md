@@ -1,4 +1,5 @@
-MEDAI
+MEDAI (To run this use a IDE and bash python server.py in powershell) 
+make sure to install pip install google-genai and python server.py in power-shell before running it.
 -------
 **WARNING: DO NOT CONSIDER THIS AI'S OUTPUT AS A CONFIRMED DIAGNOSIS. PLEASE CONSULT A QUALIFIED MEDICAL PROFESSIONAL FOR PROPER DIAGNOSIS AND TREATMENT. THIS APPLICATION IS INTENDED ONLY AS A REFERENCE TOOL FOR DOCTORS, MEDICAL PROFESSIONALS, OR PATIENTS.
 -------------------------------
