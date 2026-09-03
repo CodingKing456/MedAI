@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MedAI — Medical AI Research</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="background-grid"></div>
+  <header class="navbar">
+    <a class="logo" href="#top"><span>+</span> MedAI</a>
+    <nav>
+      <a href="#xray">X-Ray Analysis</a>
+      <a href="#risk">Risk Analysis</a>
+      <a href="#about">About</a>
+      <button id="apiKeyButton" class="nav-button">API Key</button>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="hero-content">
+        <p class="eyebrow">AI-POWERED MEDICAL RESEARCH</p>
+        <h1>Medical imaging, <span>re-imagined.</span></h1>
+        <p class="hero-text">A research platform for X-ray analysis and  health-data exploration.</p>
+        <div class="hero-actions">
+          <a class="button" href="#xray">Start Analysis</a>
+          <button class="button secondary" id="heroApiButton">Configure API Key</button>
+        </div>
+        <div class="secure-line"><span class="pulse"></span><span id="keyStatus">API key not configured</span></div>
+      </div>
+      <div class="hero-visual">
+        <div class="orbital orbital-one"></div>
+        <div class="orbital orbital-two"></div>
+        <div class="medical-cross">+</div>
+        <div class="scan-line"></div>
+        <div class="hero-card">
+          <span>MEDAI</span>
+          <small>MedAI RESEARCH ENGINE</small>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="xray">
+      <div class="section-heading">
+        <p class="eyebrow">01 · MEDICAL IMAGING</p>
+        <h2>X-Ray Analysis</h2>
+        <p>Upload a de-identified X-ray and ask MedAI to identify visible patterns and produce research-oriented findings.</p>
+      </div>
+
+      <div class="analysis-grid">
+        <div class="panel upload-panel">
+          <div class="panel-label">IMAGE INPUT</div>
+          <label class="dropzone" id="dropzone" for="xrayInput">
+            <input id="xrayInput" type="file" accept="image/png,image/jpeg,image/webp">
+            <div class="upload-icon">↑</div>
+            <strong>Choose an X-ray image</strong>
+            <span>PNG, JPG, or WEBP</span>
+          </label>
+          <img id="preview" class="preview hidden" alt="X-ray preview">
+          <button id="analyzeButton" class="button full" disabled>Analyze with MedAI</button>
+          <p id="status" class="status"></p>
+        </div>
+
+        <div class="panel result-panel">
+          <div class="result-title">
+            <div>
+              <div class="panel-label">AI OUTPUT</div>
+              <h3>AI Findings</h3>
+            </div>
+            <span id="resultBadge">Waiting</span>
+          </div>
+          <div id="results" class="results">
+            <div class="empty-state">
+              <div class="empty-icon">+</div>
+              <p>Upload an image.</p>
+              <span>Results are experimental and must not be treated as a medical diagnosis.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="risk">
+      <div class="section-heading">
+        <p class="eyebrow">02 · STRUCTURED DATA</p>
+        <h2>Disease Risk Analysis</h2>
+        <p>Structured health-related inputs may affect an AI-generated research assessment.</p>
+      </div>
+
+      <div class="panel">
+        <form id="riskForm" class="risk-form">
+          <label>Age <input id="age" type="number" min="1" max="120" required></label>
+          <label>Sex
+            <select id="sex">
+              <option value="unspecified">Prefer not to specify</option>
+              <option value="female">Female</option>
+              <option value="male">Male</option>
+              <option value="other">Other</option>
+            </select>
+          </label>
+          <label class="wide">Symptoms <input id="symptoms" type="text" placeholder="e.g. fatigue, cough"></label>
+          <label class="wide">Known conditions <input id="conditions" type="text" placeholder="Optional"></label>
+          <label class="wide">Family history <input id="familyHistory" type="text" placeholder="Optional"></label>
+          <button class="button" type="submit">Generate Research Assessment</button>
+        </form>
+        <div id="riskResult" class="risk-result"></div>
+      </div>
+    </section>
+
+    <section class="section about" id="about">
+      <div class="section-heading">
+        <p class="eyebrow">03 · ABOUT MEDAI</p>
+        <h2>Built for experimentation and learning.</h2>
+        <p>MedAI combines multimodal AI with a focused web interface to explore medical-image interpretation and structured risk analysis.</p>
+      </div>
+      <div class="notice">
+        <strong>Important:</strong> MedAI is an experimental research/education project. Its outputs are not a confirmed diagnosis, treatment recommendation, or substitute for a qualified clinician. Use only de-identified or appropriately authorized data.
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <strong>MedAI</strong>
+    <span>AI-powered medical imaging and risk analysis · Research prototype</span>
+  </footer>
+
+  <div id="apiModal" class="modal hidden">
+    <div class="modal-card">
+      <button id="closeModal" class="close-button">×</button>
+      <div class="panel-label">GEMINI CONFIGURATION</div>
+      <h2>Use your own API key</h2>
+      <p>Enter your Gemini API key to use MedAI. The key is stored only in this browser session and sent with your analysis request.</p>
+      <label class="key-label">Gemini API Key
+        <div class="key-input">
+          <input id="apiKeyInput" type="password" placeholder="Enter your Gemini API key" autocomplete="off">
+          <button id="toggleKey" type="button">Show</button>
+        </div>
+      </label>
+      <div class="modal-actions">
+        <button id="saveKey" class="button">Save API Key</button>
+        <button id="clearKey" class="button secondary">Clear</button>
+      </div>
+      <p id="apiMessage" class="modal-message"></p>
+    </div>
+  </div>
+
+  <script>
+const xrayInput = document.getElementById("xrayInput");
+const preview = document.getElementById("preview");
+const analyzeButton = document.getElementById("analyzeButton");
+const statusBox = document.getElementById("status");
+const results = document.getElementById("results");
+const resultBadge = document.getElementById("resultBadge");
+const apiModal = document.getElementById("apiModal");
+const apiKeyInput = document.getElementById("apiKeyInput");
+const apiMessage = document.getElementById("apiMessage");
+const keyStatus = document.getElementById("keyStatus");
+
+let selectedFile = null;
+
+function getApiKey() {
+  return sessionStorage.getItem("medai_gemini_api_key") || "";
+}
+
+function updateKeyStatus() {
+  const configured = Boolean(getApiKey());
+  keyStatus.textContent = configured ? "API key configured for this session" : "API key not configured";
+}
+
+function openApiModal() {
+  apiKeyInput.value = getApiKey();
+  apiMessage.textContent = "";
+  apiModal.classList.remove("hidden");
+  setTimeout(() => apiKeyInput.focus(), 50);
+}
+
+function closeApiModal() {
+  apiModal.classList.add("hidden");
+}
+
+document.getElementById("apiKeyButton").addEventListener("click", openApiModal);
+document.getElementById("heroApiButton").addEventListener("click", openApiModal);
+document.getElementById("closeModal").addEventListener("click", closeApiModal);
+
+apiModal.addEventListener("click", event => {
+  if (event.target === apiModal) closeApiModal();
+});
+
+document.getElementById("toggleKey").addEventListener("click", event => {
+  const visible = apiKeyInput.type === "text";
+  apiKeyInput.type = visible ? "password" : "text";
+  event.target.textContent = visible ? "Show" : "Hide";
+});
+
+document.getElementById("saveKey").addEventListener("click", () => {
+  const key = apiKeyInput.value.trim();
+  if (!key) {
+    apiMessage.textContent = "Enter an API key first.";
+    return;
+  }
+  sessionStorage.setItem("medai_gemini_api_key", key);
+  updateKeyStatus();
+  apiMessage.textContent = "API key saved for this browser session.";
+  setTimeout(closeApiModal, 700);
+});
+
+document.getElementById("clearKey").addEventListener("click", () => {
+  sessionStorage.removeItem("medai_gemini_api_key");
+  apiKeyInput.value = "";
+  updateKeyStatus();
+  apiMessage.textContent = "API key cleared.";
+});
+
+xrayInput.addEventListener("change", () => {
+  selectedFile = xrayInput.files?.[0] || null;
+  if (!selectedFile) return;
+
+  if (!selectedFile.type.startsWith("image/")) {
+    statusBox.textContent = "Please choose an image file.";
+    analyzeButton.disabled = true;
+    return;
+  }
+
+  preview.src = URL.createObjectURL(selectedFile);
+  preview.classList.remove("hidden");
+  analyzeButton.disabled = false;
+  statusBox.textContent = `${selectedFile.name} selected.`;
+  resultBadge.textContent = "Ready";
+});
+
+analyzeButton.addEventListener("click", async () => {
+  if (!selectedFile) return;
+
+  const apiKey = getApiKey();
+  if (!apiKey) {
+    openApiModal();
+    return;
+  }
+
+  analyzeButton.disabled = true;
+  resultBadge.textContent = "Analyzing";
+  statusBox.textContent = "MedAI is analyzing the image…";
+  results.innerHTML = '<p class="muted">Processing multimodal image input. Please wait.</p>';
+
+  try {
+    const base64 = await fileToBase64(selectedFile);
+
+    const response = await fetch("/api/analyze-xray", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        mimeType: selectedFile.type,
+        imageBase64: base64,
+        apiKey
+      })
+    });
+
+    const responseText = await response.text();
+    let data;
+
+    try {
+      data = responseText ? JSON.parse(responseText) : {};
+    } catch {
+      throw new Error(`The analysis service returned an invalid response (${response.status}).`);
+    }
+
+    if (!response.ok) throw new Error(data.error || `Analysis failed (${response.status}).`);
+    if (!data || typeof data !== "object") throw new Error("The analysis service returned an invalid response.");
+
+    renderXrayResults(data);
+    resultBadge.textContent = "Complete";
+    statusBox.textContent = "Analysis complete.";
+  } catch (error) {
+    resultBadge.textContent = "Error";
+    statusBox.textContent = error.message;
+    results.innerHTML = `<p class="muted">${escapeHtml(error.message)}</p>`;
+  } finally {
+    analyzeButton.disabled = false;
+  }
+});
+
+document.getElementById("riskForm").addEventListener("submit", event => {
+  event.preventDefault();
+
+  const output = document.getElementById("riskResult");
+  output.innerHTML = '<p class="muted">This prototype currently keeps risk analysis local to the browser.</p>';
+
+  const age = Number(document.getElementById("age").value);
+  const symptoms = document.getElementById("symptoms").value.trim();
+  const conditions = document.getElementById("conditions").value.trim();
+  const familyHistory = document.getElementById("familyHistory").value.trim();
+
+  if (!age) return;
+
+  output.innerHTML = `
+    <div class="result-block">
+      <h4>Research Input Summary</h4>
+      <p>Age: ${escapeHtml(String(age))}</p>
+      <p>Symptoms: ${escapeHtml(symptoms || "None provided")}</p>
+      <p>Known conditions: ${escapeHtml(conditions || "None provided")}</p>
+      <p>Family history: ${escapeHtml(familyHistory || "None provided")}</p>
+    </div>
+    <div class="notice">
+      A validated disease-probability model has not been installed in this prototype.
+      These inputs should not be converted into a medical risk score without a clinically
+      validated model and appropriate validation data.
+    </div>`;
+});
+
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = String(reader.result);
+      resolve(result.includes(",") ? result.split(",")[1] : result);
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+function renderXrayResults(data) {
+  const findings = Array.isArray(data.findings) ? data.findings : [];
+  const interpretations = Array.isArray(data.possibleInterpretations) ? data.possibleInterpretations : [];
+  const limitations = Array.isArray(data.limitations) ? data.limitations : [];
+
+  results.innerHTML = `
+    <div class="result-block">
+      <h4>Study</h4>
+      <p>${escapeHtml(data.studyType || "Medical X-ray")}</p>
+    </div>
+    <div class="result-block">
+      <h4>Visible Findings</h4>
+      ${listHtml(findings, "No specific findings returned.")}
+    </div>
+    <div class="result-block">
+      <h4>Possible Interpretations</h4>
+      ${listHtml(interpretations, "No interpretation returned.")}
+    </div>
+    <div class="result-block">
+      <h4>Limitations</h4>
+      ${listHtml(limitations, "Image interpretation has limitations.")}
+    </div>
+    <div class="notice">
+      ${escapeHtml(data.disclaimer || "AI-generated research output is not a confirmed diagnosis.")}
+    </div>`;
+}
+
+function listHtml(items, emptyText) {
+  if (!items.length) return `<p>${escapeHtml(emptyText)}</p>`;
+  return `<ul>${items.map(item => `<li>${escapeHtml(String(item))}</li>`).join("")}</ul>`;
+}
+
+function escapeHtml(value) {
+  return value.replace(/[&<>"']/g, char => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
+  }[char]));
+}
+
+updateKeyStatus();
+  </script>
+</body>
+</html>
