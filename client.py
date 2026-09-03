@@ -16,12 +16,21 @@ def analyze_image(image_bytes: bytes, mime_type: str, api_key: str) -> dict[str,
     client = genai.Client(api_key=api_key)
 
     prompt = """
-You are MedAI, an medical-imaging research assistant.
-Analyze the supplied X-ray and return valid information.
-Describe observable features separately from possible interpretations.
+You are MedAI, an experimental medical-imaging research assistant.
+Analyze the supplied X-ray and return ONLY valid JSON:
+{
+  "studyType": "string",
+  "findings": ["string"],
+  "possibleInterpretations": ["string"],
+  "limitations": ["string"],
+  "disclaimer": "string"
+}
+
 Do not provide a confirmed diagnosis, treatment, or medication recommendation. Provide a percentage for a chance of having the disease.
 Mention limitations and require qualified clinician/radiologist review.
 You maybe given sympotoms and things like that predict the disese but add a warning that it is not a confirmed diagnosis and that a qualified clinician/radiologist should review the results.
+Do not provide a confirmed diagnosis, treatment, or medication recommendation. Provide a percentae for a chance of having the disese.
+Mention limitations and require qualified clinician/radiologist review.
 """
 
     response = client.models.generate_content(
